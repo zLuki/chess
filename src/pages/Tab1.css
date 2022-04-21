@@ -1,0 +1,26 @@
+.outer-div {
+    display: flex;
+    height: 12.5vw;
+    width: 100vw;
+}
+
+.inner-div {
+    width: 12.5vw;
+    height: inherit;
+    border: 1px black solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.black {
+    background-color: chocolate;
+}
+
+.white {
+    background-color: wheat;
+}
+
+.piece {
+    height: 12.5vw;
+}
