@@ -24,3 +24,7 @@
 .piece {
     height: 12.5vw;
 }
+
+.green {
+    background-color: lightgreen !important;
+}

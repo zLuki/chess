@@ -13,13 +13,12 @@ const Tab1: React.FC = () => {
       setShowErrorAlert(true);
       return;
     }
-    const board = globalBoard.map(e => e.slice());
+    const board = [...Array(8)].map(e => [...Array(8)].map(e => ''));
     const position = fen.slice(0, fen.indexOf(" ")).split("/");
-    console.log(position);
     for (let i = 0; i < position.length; i++) {
       let column = 0;
       for (let x = 0; x < position[i].length; x++) {
-        if (/\d/.test(position[i])) {
+        if (/\d/.test(position[i][x])) {
           column += parseInt(position[i][x]);
           continue;
         }
@@ -27,7 +26,22 @@ const Tab1: React.FC = () => {
         column++;
       }
     }
-    setGlobalBoard(board);
+    fetch("https://chess.apurn.com/nextmove", {
+      method: "POST",
+      body: fen
+    }).then(res => res.text())
+    .then(res => {
+      let f = "";
+      for (let i = 0; i < res.length; i++) {
+        if (/\D/.test(res[i])) f += res[i].charCodeAt(0)-97;
+        else f += res[i];
+      }
+      
+      board[8-parseInt(f[1])][parseInt(f[0])] += "_G";
+      board[8-parseInt(f[3])][parseInt(f[2])] += "_G";
+      
+      setGlobalBoard(board);
+    });
   }
 
   return (
@@ -38,18 +52,15 @@ const Tab1: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        
-        {/* <IonTextarea>Hallo Welt</IonTextarea> */}
         <IonInput value={fen} onIonChange={e => setFen(e.detail.value!)}></IonInput>
         <IonButton onClick={buildPosition}>Stellung aufbauen</IonButton>
-        
         {
           globalBoard.map((e,i) =>
           <div key={"row_"+i} className="outer-div">
             {e.map((e2,i2) =>
-            <div key={"cell_"+(i+i2)} className={"inner-div " + ((i+i2)%2===0?"white":"black")}>
-              {e2.length > 0 ? <img className='piece' alt="chess_piece"
-                src={"assets/"+(e2.toLowerCase()===e2?"b_":"w_")+e2+".png"}
+            <div key={"cell_"+(i+i2)} className={"inner-div " + ((i+i2)%2===0?"white":"black") + (e2.includes("_G")?" green":"")}>
+              {e2.replace("_G", "").length > 0 ? <img className='piece' alt="chess_piece"
+                src={"assets/"+(e2.toLowerCase().replace("_g","")===e2.replace("_G","")?"b_":"w_")+e2.toLowerCase().replace("_g","")+".png"}
               /> : null}
             </div>)}
           </div>)
@@ -58,6 +69,10 @@ const Tab1: React.FC = () => {
           isOpen={showErrorAlert}
           onDidDismiss={() => setShowErrorAlert(false)}
           message={"Invalid FEN!"}
+          buttons={[{
+            text: "OK",
+            handler: () => setShowErrorAlert(false)
+          }]}
         />
       </IonContent>
     </IonPage>
