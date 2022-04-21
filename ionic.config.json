@@ -1,0 +1,8 @@
+{
+  "name": "Chess",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react",
+  "id": "e20e8abc"
+}
